@@ -14,18 +14,18 @@ const canvas = document.getElementById("myCanvas");
 const canvasContext = canvas.getContext("2d");
 
 const coordinates = [
-  [200, 400],
-  [400, 400],
-  [110, 100],
-  [250, 500],
-  [250, 300],
-  [100, 400],
-  [160, 200],
-  [300, 400],
-  [150, 500],
-  [150, 300],
-  [210, 100],
-  [350, 300]
+  [300, 300],
+  [700, 300],
+  [200, 240],
+  [400, 500],
+  [400, 100],
+  [100, 300],
+  [300, 440],
+  [500, 300],
+  [200, 500],
+  [200, 100],
+  [400, 240],
+  [600, 100]
 ]
 
 const noteNames = [
@@ -43,31 +43,48 @@ const noteNames = [
   "B"
 ]
 
+const consonances = [
+  ["F", "C"],
+  ["F", "A"],
+  ["F", "A-flat"],
+  ["A", "E"],
+  ["A", "C"],
+  ["A-flat", "E-flat"],
+  ["A-flat", "C"],
+  ["C", "G"],
+  ["C", "E"],
+  ["C", "E-flat"],
+  ["E", "B"],
+  ["E", "G"],
+  ["E-flat", "G"],
+  ["G", "D"],
+  ["G", "B"],
+  ["B", "D"],
+  ["E-flat-seven", "F"],
+  ["E-flat-seven", "A"],
+  ["E-flat-seven", "C"],
+  ["G-flat-seven", "A-flat"],
+  ["G-flat-seven", "C"],
+  ["G-flat-seven", "E-flat"],
+  ["B-flat-seven", "C"],
+  ["B-flat-seven", "E"],
+  ["B-flat-seven", "G"],
+  ["E-flat-seven", "G-flat-seven"],
+  ["E-flat-seven", "B-flat-seven"],
+  ["G-flat-seven", "B-flat-seven"],
+]
+
+console.log(consonances);
+
 const nameToCoordinatesMap = dictFromArrays(noteNames, coordinates);
-
-drawLine(canvasContext, nameToCoordinatesMap["F"], nameToCoordinatesMap["C"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["C"], nameToCoordinatesMap["G"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["G"], nameToCoordinatesMap["D"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["A"], nameToCoordinatesMap["E"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["E"], nameToCoordinatesMap["B"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["A-flat"], nameToCoordinatesMap["E-flat"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["E-flat-seven"], nameToCoordinatesMap["B-flat-seven"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["F"], nameToCoordinatesMap["A"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["C"], nameToCoordinatesMap["E"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["G"], nameToCoordinatesMap["B"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["A-flat"], nameToCoordinatesMap["C"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["E-flat"], nameToCoordinatesMap["G"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["G-flat-seven"], nameToCoordinatesMap["B-flat-seven"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["C"], nameToCoordinatesMap["B-flat-seven"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["F"], nameToCoordinatesMap["E-flat-seven"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["A-flat"], nameToCoordinatesMap["G-flat-seven"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["F"], nameToCoordinatesMap["A-flat"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["A"], nameToCoordinatesMap["C"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["C"], nameToCoordinatesMap["E-flat"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["E"], nameToCoordinatesMap["G"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["B"], nameToCoordinatesMap["D"], "BLACK");
-drawLine(canvasContext, nameToCoordinatesMap["E-flat-seven"], nameToCoordinatesMap["G-flat-seven"], "BLACK");
-
+consonances.map(
+  consonance => drawLine(
+    canvasContext,
+    nameToCoordinatesMap[consonance[0]],
+    nameToCoordinatesMap[consonance[1]],
+    "BLACK"
+  )
+);
 
 const keyDrawerList = coordinates.map(
   pair => new KeyDrawer(canvasContext, pair[0], pair[1])
