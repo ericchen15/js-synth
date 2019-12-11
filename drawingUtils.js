@@ -12,3 +12,11 @@ function drawCircle(context, coordinates, radius, color) {
   context.closePath();
   context.fill();
 }
+
+function writeText(context, coordinates, font, color, text) {
+  context.font = font;
+  context.fillStyle = color;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText(text, coordinates.x, coordinates.y)
+}

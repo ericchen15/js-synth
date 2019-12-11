@@ -37,12 +37,21 @@ allConsonances.map(
   )
 );
 
+const noteNames =
+  ["D", "E\u{266D}7", "E\u{266D}", "E", "F", "G\u{266D}7", "G", "A\u{266D}", "A", "B\u{266D}7", "B", "C"];
+const scaleToNoteNames = dictFromArrays(scale, noteNames);
+
+console.log(scaleToNoteNames);
+
 const keyDrawerList = scale.map(
   note => new KeyDrawer(
     canvasContext,
-    scaleToCoordinates.get(note)
+    scaleToCoordinates.get(note),
+    scaleToNoteNames[note]
   )
 );
+
+keyDrawerList.map(keyDrawer => keyDrawer.erase());
 
 const frequencyList = range(KEY_CODE_LIST.length).map(
   i => calculateFrequency(scale, baseFrequency, i - baseIndex)

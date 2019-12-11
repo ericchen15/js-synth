@@ -1,16 +1,19 @@
 class KeyDrawer {
-  constructor(context, coordinates) {
+  constructor(context, coordinates, noteName) {
     this.context = context;
     this.coordinates = coordinates;
+    this.noteName = noteName;
     this.activeKeys = new Set();
   }
 
   draw() {
-    drawCircle(this.context, this.coordinates, 5, "RED");
+    drawCircle(this.context, this.coordinates, 10, "YELLOW");
+    writeText(this.context, this.coordinates, "12x Arial", "RED", this.noteName);
   }
 
   erase() {
-    drawCircle(this.context, this.coordinates, 6, "WHITE");
+    drawCircle(this.context, this.coordinates, 11, "WHITE");
+    writeText(this.context, this.coordinates, "12px Arial", "RED", this.noteName);
   }
 
   press(key) {
