@@ -1,14 +1,14 @@
-function drawLine(context, point1, point2, color) {
+function drawLine(context, coordinates1, coordinates2, color) {
   context.strokeStyle = color;
-  context.moveTo(point1[0], point1[1]);
-  context.lineTo(point2[0], point2[1]);
+  context.moveTo(coordinates1.x, coordinates1.y);
+  context.lineTo(coordinates2.x, coordinates2.y);
   context.stroke();
 }
 
-function drawCircle(context, x, y, radius, color) {
+function drawCircle(context, coordinates, radius, color) {
   context.fillStyle = color;
   context.beginPath();
-  context.arc(x, y, radius, 0, 2 * Math.PI);
+  context.arc(coordinates.x, coordinates.y, radius, 0, 2 * Math.PI);
   context.closePath();
   context.fill();
 }
