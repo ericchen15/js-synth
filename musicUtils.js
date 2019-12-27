@@ -42,9 +42,13 @@ function createEtScale(periodRatio, numTones) {
 }
 
 function createEdoScale(periodRatio, numTones, degrees) {
-  return createEtScale(periodRatio, numTones).filter(
-    ((x, i) => degrees.includes(i + 1))
-  );
+  const etScale = createEtScale(periodRatio, numTones);
+  var edoScale = [];
+  for (var i = 0; i < degrees.length; i++) {
+    var currDegree = degrees[i] - 1;
+    edoScale.push(etScale[currDegree]);
+  }
+  return edoScale;
 }
 
 function createGeneratorScale(periodRatio, generatorRatio, numTones, positionOfRoot) {

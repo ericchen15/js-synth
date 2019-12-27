@@ -7,12 +7,12 @@ class KeyDrawer {
   }
 
   draw() {
-    drawCircle(this.context, this.coordinates, 10, "YELLOW");
-    writeText(this.context, this.coordinates, "12x Arial", "RED", this.noteName);
+    drawCircle(this.context, this.coordinates, 12, "YELLOW");
+    writeText(this.context, this.coordinates, "12px Arial", "RED", this.noteName);
   }
 
   erase() {
-    drawCircle(this.context, this.coordinates, 11, "WHITE");
+    drawCircle(this.context, this.coordinates, 12, "WHITE");
     writeText(this.context, this.coordinates, "12px Arial", "RED", this.noteName);
   }
 
@@ -29,4 +29,12 @@ class KeyDrawer {
       this.erase();
     }
   }
+}
+
+function createDummyKeyDrawer(context) {
+  return new KeyDrawer(
+    context,
+    new Coordinates(300, 300),
+    ""
+  )
 }

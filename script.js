@@ -1,6 +1,8 @@
 const context = new window.AudioContext();
 
-const scale = experimentalScale;
+const shouldDraw = true;
+const scale = sevenScale;
+
 const baseFrequency = 65;
 const baseIndex = 2;
 const waveType = "sawtooth";
@@ -9,49 +11,54 @@ const filter = createFilter(context, "lowpass", 6000);
 console.log(scale);
 console.log(scale.map(ratioToCents));
 
-// begin drawing section
 const canvas = document.getElementById("myCanvas");
 const canvasContext = canvas.getContext("2d");
 
-const basisRatios = [3/2, 5/4, 7/4];
-const rootCoordinates = new Coordinates(300, 300);
-const basisDirections = [
-  new Coordinates(200, 0),
-  new Coordinates(100, -200),
-  new Coordinates(100, -60)
-];
-const scaleToCoordinates =
-  getAllCoordinates(scale, basisRatios, rootCoordinates, basisDirections)
+var keyDrawerList;
 
-const consonances = [3/2, 5/4, 5/3, 7/4, 7/5, 7/6];
-const allConsonances = getAllConsonances(scale, consonances);
+if (shouldDraw) {
+  const noteNames = sevenNames;
+  const basisRatios = sevenBasisRatios;
+  const consonances = sevenConsonances;
+  const scaleToNoteNames = dictFromArrays(scale, noteNames);
 
-console.log(allConsonances);
+  const rootCoordinates = new Coordinates(300, 300);
+  const basisDirections = [
+    new Coordinates(180, 0),
+    new Coordinates(90, -180),
+    new Coordinates(90, -60)
+  ];
+  const scaleToCoordinates =
+    getAllCoordinates(scale, basisRatios, rootCoordinates, basisDirections);
 
-allConsonances.map(
-  consonance => drawLine(
-    canvasContext,
-    scaleToCoordinates.get(consonance[0]),
-    scaleToCoordinates.get(consonance[1]),
-    "BLACK"
-  )
-);
+  const allConsonances = getAllConsonances(scale, consonances);
 
-const noteNames =
-  ["D", "E\u{266D}7", "E\u{266D}", "E", "F", "G\u{266D}7", "G", "A\u{266D}", "A", "B\u{266D}7", "B", "C"];
-const scaleToNoteNames = dictFromArrays(scale, noteNames);
+  console.log(allConsonances);
 
-console.log(scaleToNoteNames);
+  allConsonances.map(
+    consonance => drawLine(
+      canvasContext,
+      scaleToCoordinates.get(consonance[0]),
+      scaleToCoordinates.get(consonance[1]),
+      "BLACK"
+    )
+  );
 
-const keyDrawerList = scale.map(
-  note => new KeyDrawer(
-    canvasContext,
-    scaleToCoordinates.get(note),
-    scaleToNoteNames[note]
-  )
-);
+  console.log(scaleToNoteNames);
 
-keyDrawerList.map(keyDrawer => keyDrawer.erase());
+  keyDrawerList = scale.map(
+    note => new KeyDrawer(
+      canvasContext,
+      scaleToCoordinates.get(note),
+      scaleToNoteNames[note]
+    )
+  );
+
+  keyDrawerList.map(keyDrawer => keyDrawer.erase());
+} else {
+  const defaultKeyDrawer = createDummyKeyDrawer(canvasContext);
+  keyDrawerList = Array(scale.length).fill(defaultKeyDrawer);
+}
 
 const frequencyList = range(KEY_CODE_LIST.length).map(
   i => calculateFrequency(scale, baseFrequency, i - baseIndex)
