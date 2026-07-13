@@ -19,7 +19,7 @@ const bigSevenScale = [21/20, 16/15, 9/8, 7/6, 6/5, 5/4, 21/16, 4/3, 7/5, 3/2, 8
 const bigSevenNames = ["D\u{266D}7", "D\u{266D}-", "D", "E\u{266D}7", "E\u{266D}", "E", "F7+",  "F", "G\u{266D}7", "G", "A\u{266D}", "A", "B\u{266D}7", "B\u{266D}", "B", "C"];
 
 // ET scales
-const tet12Scale = createEtScale(2, 12);
+const tet12Scale = createEtScale(2.0001, 12);
 const tet10Scale = createEtScale(2, 10);
 
 // EDO scales
