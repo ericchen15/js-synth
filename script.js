@@ -1,10 +1,10 @@
 const context = new window.AudioContext();
 
-const shouldDraw = true;
-const scale = sevenScale;
+const shouldDraw = false;
+const scale = tet12Scale;
 
-const baseFrequency = 65;
-const baseIndex = 2;
+const baseFrequency = 130.81;
+const baseIndex = 10;
 const waveType = "sawtooth";
 const filter = createFilter(context, "lowpass", 6000);
 
@@ -14,10 +14,20 @@ console.log(scale.map(ratioToCents));
 const canvas = document.getElementById("myCanvas");
 const canvasContext = canvas.getContext("2d");
 
-var keyDrawerList;
+const tonnetzNodes = createTonnetzNodes(canvasContext);
+drawGridLines(canvasContext, tonnetzNodes);
+
+const keyDrawerList = tet12NodeLists.map(nodeList => 
+    new MultiKeyDrawer(
+        canvasContext,
+        nodeList.map(nodeName => tonnetzNodes[nodeName]
+    ))
+);
+
+keyDrawerList.map(keyDrawer => keyDrawer.erase());
 
 if (shouldDraw) {
-  const noteNames = sevenNames;
+  const noteNames = bigSevenNames;
   const basisRatios = sevenBasisRatios;
   const consonances = sevenConsonances;
   const scaleToNoteNames = dictFromArrays(scale, noteNames);
@@ -55,9 +65,6 @@ if (shouldDraw) {
   );
 
   keyDrawerList.map(keyDrawer => keyDrawer.erase());
-} else {
-  const defaultKeyDrawer = createDummyKeyDrawer(canvasContext);
-  keyDrawerList = Array(scale.length).fill(defaultKeyDrawer);
 }
 
 const frequencyList = range(KEY_CODE_LIST.length).map(
