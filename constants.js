@@ -1,4 +1,5 @@
 const KEY_CODE_LIST = [
+  "Backquote", "Tab", "CapsLock", "ShiftLeft",
   "Digit1", "KeyQ", "KeyA", "KeyZ",
   "Digit2", "KeyW", "KeyS", "KeyX",
   "Digit3", "KeyE", "KeyD", "KeyC",
