@@ -17,9 +17,11 @@ class Key {
     this.noteFilter = noteFilter;  // null unless instrument.brightness is set
     this.gainNode = gainNode;
     this.listener = listener;
+    this.isActive = false;  // pressed and not yet released (sustained keys stay active)
   }
 
   press() {
+    this.isActive = true;
     const now = this.context.currentTime;
     const gain = this.gainNode.gain;
     gain.cancelScheduledValues(now);  // drop a decay left over from the last press
@@ -47,11 +49,26 @@ class Key {
   }
 
   release() {
+    this.isActive = false;
     const now = this.context.currentTime;
     const gain = this.gainNode.gain;
     gain.cancelScheduledValues(now);  // otherwise a pending decay would override the release
     gain.setTargetAtTime(0, now, this.instrument.releaseTimeConstant);
     this.listener.release(this);
+  }
+
+  /**
+   * Permanently shuts the key down: releases it if it's active, then stops its
+   * oscillators once the release has faded (10 time constants is well below
+   * audible) and unhooks it from the audio graph.
+   */
+  dispose() {
+    if (this.isActive) {
+      this.release();
+    }
+    const stopTime = this.context.currentTime + 10 * this.instrument.releaseTimeConstant;
+    this.oscillators[0].onended = () => this.gainNode.disconnect();
+    this.oscillators.forEach(oscillator => oscillator.stop(stopTime));
   }
 
   /** Multiplies the pitch, e.g. by 2 to go up an octave. */

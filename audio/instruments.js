@@ -1,4 +1,5 @@
-// Instrument presets. Pick one with INSTRUMENT in script.js.
+// Instrument presets. They appear in the dropdown on the page; DEFAULT_INSTRUMENT
+// in script.js picks the starting one.
 //
 // Required fields:
 //   waveType             OscillatorNode type: "sine", "square", "sawtooth" or "triangle"

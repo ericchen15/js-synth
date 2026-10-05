@@ -15,7 +15,7 @@
 const SCALE = tet12Scale;          // any scale from scales.js
 const BASE_FREQUENCY = 130.81;     // Hz (C3)
 const BASE_KEY_INDEX = 10;         // KEY_CODE_LIST index that plays BASE_FREQUENCY ("KeyS")
-const INSTRUMENT = INSTRUMENTS.synth;  // any preset from audio/instruments.js
+const DEFAULT_INSTRUMENT = "synth";  // key in INSTRUMENTS (audio/instruments.js); switchable on the page
 
 // "tonnetz": the fixed 12-TET Tonnetz from drawing/tonnetz.js (SCALE must have 12 notes).
 // "lattice": a lattice laid out automatically from SCALE by drawing/lattice.js, using
@@ -68,7 +68,7 @@ function createLatticeKeyDrawers(canvasContext) {
 // ---- Setup ----
 
 const audioContext = new window.AudioContext();
-const filter = createFilter(audioContext, "lowpass", INSTRUMENT.lowpassCutoff);
+const filter = createFilter(audioContext, "lowpass", INSTRUMENTS[DEFAULT_INSTRUMENT].lowpassCutoff);
 
 console.log(SCALE);
 console.log(SCALE.map(ratioToCents));
@@ -83,17 +83,48 @@ keyDrawers.forEach(keyDrawer => keyDrawer.erase());  // draw every node unlit
 // s is scale degree (s mod length), and degree d is drawn by keyDrawers[d - 1]
 // (the root, degree 0, is the last drawer). See the scale format in
 // music/musicUtils.js.
-const keyList = KEY_CODE_LIST.map((_, i) => {
-  const steps = i - BASE_KEY_INDEX;
-  return createKey(
+function createKeys(instrument, frequencies) {
+  return frequencies.map((frequency, i) => createKey(
     audioContext,
-    calculateFrequency(SCALE, BASE_FREQUENCY, steps),
-    INSTRUMENT,
-    keyDrawers[mod(steps - 1, SCALE.length)]
-  );
-});
+    frequency,
+    instrument,
+    keyDrawers[mod(i - BASE_KEY_INDEX - 1, SCALE.length)]
+  ));
+}
 
-const synth = new Synth(audioContext, KEY_CODE_LIST, keyList, filter);
+const synth = new Synth(
+  audioContext,
+  KEY_CODE_LIST,
+  createKeys(
+    INSTRUMENTS[DEFAULT_INSTRUMENT],
+    KEY_CODE_LIST.map((_, i) => calculateFrequency(SCALE, BASE_FREQUENCY, i - BASE_KEY_INDEX))
+  ),
+  filter
+);
+
+/** Rebuilds every key with another instrument, keeping current pitches (and so any octave shift). */
+function switchInstrument(name) {
+  const instrument = INSTRUMENTS[name];
+  filter.frequency.value = instrument.lowpassCutoff;
+  synth.replaceKeys(createKeys(instrument, synth.keyList.map(key => key.frequency())));
+}
+
+// Instrument dropdown (index.html). It's mouse-only: a focused <select> would
+// otherwise treat arrow keys and typed letters (e.g. "S", "H") as choosing an
+// option, which would switch instruments while you play.
+const instrumentSelect = document.getElementById("instrumentSelect");
+Object.keys(INSTRUMENTS).forEach(name => {
+  const option = document.createElement("option");
+  option.value = name;
+  option.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+  instrumentSelect.appendChild(option);
+});
+instrumentSelect.value = DEFAULT_INSTRUMENT;
+instrumentSelect.onchange = () => {
+  switchInstrument(instrumentSelect.value);
+  instrumentSelect.blur();
+};
+instrumentSelect.onkeydown = event => event.preventDefault();
 
 // ---- Input ----
 
