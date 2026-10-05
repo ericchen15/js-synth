@@ -16,8 +16,7 @@ Sound (`audio/`) and drawing (`drawing/`) don't depend on each other. Only `scri
 |---|---|
 | `script.js` | Entry point. **All configuration is here** (scale, base frequency, wave, filter, visualization mode); it also wires sound to drawing and handles input |
 | `keyboardLayout.js` | `KEY_CODE_LIST`: the order of the physical keys, from lowest to highest pitch |
-| `utils.js` | Generic helpers (`mod`, `range`, `dictFromArrays`) |
-| `music/musicUtils.js` | Cents/ratio math, `calculateFrequency`, scale builders (ET, EDO subsets, generator scales) |
+| `music/musicUtils.js` | `mod` (floor modulo), cents/ratio math, `calculateFrequency`, scale builders (ET, EDO subsets, generator scales) |
 | `music/scales.js` | Library of named scales and note-name arrays |
 | `audio/synth.js` | `Synth`: maps key events to `Key`s and handles sustain (Space), volume (↑↓) and octave (←→); builds the audio graph |
 | `audio/key.js` | `Key`: one note; an always-running oscillator gated by a gain envelope |

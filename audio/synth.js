@@ -8,7 +8,7 @@ class Synth {
   constructor(context, keyCodeList, keyList, filter) {
     this.context = context;
     this.keyList = keyList;
-    this.keyMap = dictFromArrays(keyCodeList, keyList);  // event.code -> Key
+    this.keyMap = new Map(keyCodeList.map((code, i) => [code, keyList[i]]));  // event.code -> Key
     this.filter = filter;
 
     // Sustain: while Space is down (`holding`), any key that gets pressed goes
@@ -38,8 +38,8 @@ class Synth {
   }
 
   onKeyDown(e) {
-    if (e.code in this.keyMap) {
-      const currKey = this.keyMap[e.code];
+    if (this.keyMap.has(e.code)) {
+      const currKey = this.keyMap.get(e.code);
       currKey.press();
       if (this.holding) {
         this.heldKeys.add(currKey);
@@ -60,8 +60,8 @@ class Synth {
   }
 
   onKeyUp(e) {
-    if (e.code in this.keyMap) {
-      const currKey = this.keyMap[e.code];
+    if (this.keyMap.has(e.code)) {
+      const currKey = this.keyMap.get(e.code);
       if (!this.heldKeys.has(currKey)) {
         currKey.release();
       }

@@ -6,6 +6,15 @@
 // repeats, usually ~2 for an octave). So scale[k] is scale degree k + 1, and
 // degree 0 is the root. Example, 12-TET: [2^(1/12), 2^(2/12), ..., 2].
 
+/**
+ * Mathematical modulo: the result is always in [0, n), even for negative a
+ * (unlike %). Use it to wrap a step count, which can be negative, into a
+ * scale degree.
+ */
+function mod(a, n) {
+  return ((a % n) + n) % n;
+}
+
 function centsToRatio(cents) {
   return Math.pow(2, cents / 1200);
 }
@@ -40,7 +49,7 @@ function calculateFrequency(scale, baseFrequency, offset) {
 
 /** Equal temperament: divides periodRatio into numTones equal steps. */
 function createEtScale(periodRatio, numTones) {
-  return range(numTones).map(i => Math.pow(periodRatio, (i + 1) / numTones));
+  return Array.from({ length: numTones }, (_, i) => Math.pow(periodRatio, (i + 1) / numTones));
 }
 
 /**
@@ -59,9 +68,9 @@ function createEdoScale(periodRatio, numTones, degrees) {
  * fifths below C) up to G♯.
  */
 function createGeneratorScale(periodRatio, generatorRatio, numTones, positionOfRoot) {
-  const generatorScale = range(numTones)
-    .map(i => normalizeRatio(Math.pow(generatorRatio, i - positionOfRoot), periodRatio))
-    .sort((a, b) => a - b);
+  const generatorScale = Array.from({ length: numTones },
+    (_, i) => normalizeRatio(Math.pow(generatorRatio, i - positionOfRoot), periodRatio)
+  ).sort((a, b) => a - b);
   generatorScale.shift(); // drop the root (1/1)
   generatorScale.push(periodRatio);
   return generatorScale;

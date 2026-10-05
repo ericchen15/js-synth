@@ -47,7 +47,6 @@ function createTonnetzKeyDrawers(canvasContext) {
 
 /** Lays out and draws a JI lattice for SCALE and returns one KeyDrawer per scale degree. */
 function createLatticeKeyDrawers(canvasContext) {
-  const scaleToNoteNames = dictFromArrays(SCALE, LATTICE_NOTE_NAMES);
   const scaleToCoordinates = getAllCoordinates(
     SCALE, LATTICE_BASIS_RATIOS, LATTICE_ROOT, LATTICE_BASIS_DIRECTIONS);
 
@@ -60,9 +59,9 @@ function createLatticeKeyDrawers(canvasContext) {
     )
   );
 
-  return SCALE.map(note =>
+  return SCALE.map((note, i) =>
     new KeyDrawer(canvasContext, [
-      new NoteNode(scaleToCoordinates.get(note), scaleToNoteNames[note])
+      new NoteNode(scaleToCoordinates.get(note), LATTICE_NOTE_NAMES[i])
     ])
   );
 }
