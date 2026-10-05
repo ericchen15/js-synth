@@ -3,14 +3,18 @@
 <head>
   <meta charset="utf-8">
   <title>js-synth</title>
+  <style>
+    #settingsPanel { margin-bottom: 8px; font-family: Arial, sans-serif; font-size: 13px; }
+    #settingsPanel .settingGroups { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+    #settingsPanel fieldset { display: flex; flex-direction: column; gap: 4px; margin: 0; }
+    #settingsPanel fieldset label { display: flex; justify-content: space-between; gap: 8px; }
+    #settingsPanel input[type="number"] { width: 70px; }
+  </style>
 </head>
 <body>
 
-  <div id="controls" style="margin-bottom: 8px; font-family: Arial, sans-serif;">
-    <label>Instrument
-      <select id="instrumentSelect"></select>  <!-- filled in by script.js -->
-    </label>
-  </div>
+  <div id="settingsPanel"></div>  <!-- filled in by settingsPanel.js -->
+
 
   <canvas
     id="myCanvas"
@@ -39,6 +43,9 @@
 <script src="drawing/keyDrawer.js"></script>
 <script src="drawing/tonnetz.js"></script>
 <script src="drawing/lattice.js"></script>
+
+<!-- Page UI -->
+<script src="settingsPanel.js"></script>
 
 <!-- Entry point: configuration and wiring -->
 <script src="script.js"></script>

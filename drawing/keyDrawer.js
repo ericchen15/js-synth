@@ -41,6 +41,12 @@ class KeyDrawer {
     });
   }
 
+  /** Forgets all pressed keys and draws the nodes unlit. */
+  reset() {
+    this.activeKeys.clear();
+    this.erase();
+  }
+
   press(key) {
     if (this.activeKeys.size === 0) {
       this.draw();

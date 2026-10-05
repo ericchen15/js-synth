@@ -1,15 +1,19 @@
-// Instrument presets. They appear in the dropdown on the page; DEFAULT_INSTRUMENT
+// Instrument presets. They appear in the instrument dropdown on the page, which
+// fills in the settings panel (settingsPanel.js) from them; DEFAULT_INSTRUMENT
 // in script.js picks the starting one.
 //
 // Required fields:
-//   waveType             OscillatorNode type: "sine", "square", "sawtooth" or "triangle"
-//     ...or harmonics    amplitudes [h1, h2, ...] of a custom periodic wave
+//   waveType             "sine", "square", "sawtooth" or "triangle" (built-in
+//                        OscillatorNode types), or "plucked" for a custom wave
+//                        made by pluckedStringHarmonics(pluckPosition, harmonicCount)
 //   noteGain             per-note volume, before the master gain
 //   attackTimeConstant   seconds; how fast a note fades in
 //   releaseTimeConstant  seconds; how fast a note fades out after key up
 //   lowpassCutoff        Hz; the lowpass filter shared by all keys
 //
-// Optional fields:
+// Optional fields (missing, null or 0 means off):
+//   pluckPosition,       (waveType "plucked" only) see pluckedStringHarmonics
+//   harmonicCount
 //   decay                the note fades out even while held. Its time constant
 //                        is timeConstant * (referenceFrequency / f) ^ pitchExponent
 //                        seconds for a note of frequency f, so lower notes
@@ -32,7 +36,9 @@ const INSTRUMENTS = {
   },
 
   harpsichord: {
-    harmonics: pluckedStringHarmonics(0.12, 80),
+    waveType: "plucked",
+    pluckPosition: 0.12,
+    harmonicCount: 80,
     noteGain: 0.05,
     attackTimeConstant: 0.002,
     releaseTimeConstant: 0.04,

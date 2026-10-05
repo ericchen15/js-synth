@@ -54,6 +54,12 @@ class Key {
     this.listener.release(this);
   }
 
+  /** Silences the key for good and unhooks it from the audio graph. */
+  stop() {
+    this.oscillators.forEach(oscillator => oscillator.stop());
+    this.gainNode.disconnect();
+  }
+
   /** Multiplies the pitch, e.g. by 2 to go up an octave. */
   changeFrequency(factor) {
     this.oscillators.forEach(oscillator => oscillator.frequency.value *= factor);
@@ -78,8 +84,9 @@ class Key {
 function createKey(context, frequency, instrument, listener) {
   const detunes = instrument.unisonDetuneCents ? [0, instrument.unisonDetuneCents] : [0];
   const oscillators = detunes.map(cents => {
-    const oscillator = instrument.harmonics
-      ? createCustomOscillator(context, frequency, instrument.harmonics)
+    const oscillator = instrument.waveType === "plucked"
+      ? createCustomOscillator(context, frequency,
+          pluckedStringHarmonics(instrument.pluckPosition, instrument.harmonicCount))
       : createOscillator(context, frequency, instrument.waveType);
     if (cents !== 0) {
       oscillator.detune.value = cents;

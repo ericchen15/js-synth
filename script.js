@@ -15,7 +15,7 @@
 const SCALE = tet12Scale;          // any scale from scales.js
 const BASE_FREQUENCY = 130.81;     // Hz (C3)
 const BASE_KEY_INDEX = 10;         // KEY_CODE_LIST index that plays BASE_FREQUENCY ("KeyS")
-const DEFAULT_INSTRUMENT = "synth";  // key in INSTRUMENTS (audio/instruments.js); switchable on the page
+const DEFAULT_INSTRUMENT = "synth";  // preset (audio/instruments.js) the settings panel starts with
 
 // "tonnetz": the fixed 12-TET Tonnetz from drawing/tonnetz.js (SCALE must have 12 notes).
 // "lattice": a lattice laid out automatically from SCALE by drawing/lattice.js, using
@@ -67,14 +67,11 @@ function createLatticeKeyDrawers(canvasContext) {
 
 // ---- Setup ----
 
-// The instrument dropdown reloads the page with ?instrument=<name>.
-const requestedInstrument = new URLSearchParams(window.location.search).get("instrument");
-const instrumentName =
-  Object.hasOwn(INSTRUMENTS, requestedInstrument) ? requestedInstrument : DEFAULT_INSTRUMENT;
-const INSTRUMENT = INSTRUMENTS[instrumentName];
+const initialSettings = createSettingsPanel(
+  document.getElementById("settingsPanel"), INSTRUMENTS, DEFAULT_INSTRUMENT, applySettings);
 
 const audioContext = new window.AudioContext();
-const filter = createFilter(audioContext, "lowpass", INSTRUMENT.lowpassCutoff);
+const filter = createFilter(audioContext, "lowpass", initialSettings.lowpassCutoff);
 
 console.log(SCALE);
 console.log(SCALE.map(ratioToCents));
@@ -89,41 +86,54 @@ keyDrawers.forEach(keyDrawer => keyDrawer.erase());  // draw every node unlit
 // s is scale degree (s mod length), and degree d is drawn by keyDrawers[d - 1]
 // (the root, degree 0, is the last drawer). See the scale format in
 // music/musicUtils.js.
-const keyList = KEY_CODE_LIST.map((_, i) => {
-  const steps = i - BASE_KEY_INDEX;
-  return createKey(
-    audioContext,
-    calculateFrequency(SCALE, BASE_FREQUENCY, steps),
-    INSTRUMENT,
-    keyDrawers[mod(steps - 1, SCALE.length)]
-  );
-});
+function createKeys(settings) {
+  return KEY_CODE_LIST.map((_, i) => {
+    const steps = i - BASE_KEY_INDEX;
+    return createKey(
+      audioContext,
+      calculateFrequency(SCALE, BASE_FREQUENCY, steps),
+      settings,
+      keyDrawers[mod(steps - 1, SCALE.length)]
+    );
+  });
+}
 
-const synth = new Synth(audioContext, KEY_CODE_LIST, keyList, filter);
+const synth = new Synth(audioContext, KEY_CODE_LIST, createKeys(initialSettings), filter);
 
-// Instrument dropdown (index.html): choosing one reloads the page with it.
-// It ignores the keyboard, because a focused <select> treats arrow keys and
-// typed letters (e.g. "S", "H") as picking an option.
-const instrumentSelect = document.getElementById("instrumentSelect");
-Object.keys(INSTRUMENTS).forEach(name => {
-  const option = document.createElement("option");
-  option.value = name;
-  option.textContent = name.charAt(0).toUpperCase() + name.slice(1);
-  instrumentSelect.appendChild(option);
-});
-instrumentSelect.value = instrumentName;
-instrumentSelect.onchange = () => {
-  window.location.search = "?instrument=" + instrumentSelect.value;
-};
-instrumentSelect.onkeydown = event => event.preventDefault();
+/**
+ * Called by the settings panel on every change: rebuilds all keys. Playing
+ * notes stop and any octave shift resets; the master volume is kept.
+ */
+function applySettings(settings) {
+  filter.frequency.value = settings.lowpassCutoff;
+  synth.replaceKeys(createKeys(settings));
+  keyDrawers.forEach(keyDrawer => keyDrawer.reset());
+}
 
 // ---- Input ----
+
+// Every key the synth responds to. Their browser defaults (Tab moving focus,
+// Space and arrows scrolling, ...) are suppressed.
+const SYNTH_KEY_CODES = new Set([
+  ...KEY_CODE_LIST, "Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"
+]);
+
+// While a settings input has focus, typing goes to it instead of the synth.
+function isTypingInPanel(event) {
+  return event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement;
+}
 
 // Codes currently held down. This ignores the auto-repeat keydown events the
 // OS sends while a key is held.
 const pressedKeys = new Set();
 
 document.onkeydown = event => {
+  if (isTypingInPanel(event)) {
+    return;
+  }
+  if (SYNTH_KEY_CODES.has(event.code)) {
+    event.preventDefault();
+  }
   if (!pressedKeys.has(event.code)) {
     synth.onKeyDown(event);
     pressedKeys.add(event.code);
@@ -131,6 +141,9 @@ document.onkeydown = event => {
 };
 
 document.onkeyup = event => {
+  if (isTypingInPanel(event)) {
+    return;
+  }
   synth.onKeyUp(event);
   pressedKeys.delete(event.code);
 };
