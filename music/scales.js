@@ -5,6 +5,10 @@
 // "octave" very slightly wide. Changing them changes the tuning, so don't
 // "fix" them to 2 by accident.
 
+// Other base frequencies (Hz) to try for BASE_FREQUENCY in script.js.
+const A1 = 55;
+const WELL_TUNED_BASE = 74.6;  // presumably meant for wellTunedScale
+
 // JI scales
 const harmonicScale = [9/8, 10/8, 11/8, 12/8, 13/8, 14/8, 15/8, 16/8];
 const lambdaScale = [25/21, 9/7, 7/5, 5/3, 9/5, 15/7, 7/3, 25/9, 3/1];  // Bohlen-Pierce (period 3/1)

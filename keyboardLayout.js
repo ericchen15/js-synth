@@ -18,7 +18,3 @@ const KEY_CODE_LIST = [
   "Minus", "BracketLeft", "Quote", "ShiftRight",
   "Equal", "BracketRight", "Enter"
 ];
-
-// Other base frequencies (Hz) to try for BASE_FREQUENCY in script.js.
-const A1 = 55;
-const WELL_TUNED_BASE = 74.6;
