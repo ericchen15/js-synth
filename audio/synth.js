@@ -7,7 +7,6 @@
 class Synth {
   constructor(context, keyCodeList, keyList, filter) {
     this.context = context;
-    this.keyCodeList = keyCodeList;
     this.keyList = keyList;
     this.keyMap = new Map(keyCodeList.map((code, i) => [code, keyList[i]]));  // event.code -> Key
     this.filter = filter;
@@ -24,20 +23,6 @@ class Synth {
     keyList.forEach(key => key.gainNode.connect(this.filter));
     this.filter.connect(this.gainNode);
     this.gainNode.connect(context.destination);
-  }
-
-  /**
-   * Swaps in a new set of keys (e.g. built with another instrument). Old keys
-   * that are still sounding fade out with their normal release, and sustain is
-   * cleared.
-   */
-  replaceKeys(keyList) {
-    this.keyList.forEach(key => key.dispose());
-    this.heldKeys.clear();
-
-    this.keyList = keyList;
-    this.keyMap = new Map(this.keyCodeList.map((code, i) => [code, keyList[i]]));
-    keyList.forEach(key => key.gainNode.connect(this.filter));
   }
 
   increaseVolume() {

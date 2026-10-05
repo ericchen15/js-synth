@@ -67,8 +67,14 @@ function createLatticeKeyDrawers(canvasContext) {
 
 // ---- Setup ----
 
+// The instrument dropdown reloads the page with ?instrument=<name>.
+const requestedInstrument = new URLSearchParams(window.location.search).get("instrument");
+const instrumentName =
+  Object.hasOwn(INSTRUMENTS, requestedInstrument) ? requestedInstrument : DEFAULT_INSTRUMENT;
+const INSTRUMENT = INSTRUMENTS[instrumentName];
+
 const audioContext = new window.AudioContext();
-const filter = createFilter(audioContext, "lowpass", INSTRUMENTS[DEFAULT_INSTRUMENT].lowpassCutoff);
+const filter = createFilter(audioContext, "lowpass", INSTRUMENT.lowpassCutoff);
 
 console.log(SCALE);
 console.log(SCALE.map(ratioToCents));
@@ -83,35 +89,21 @@ keyDrawers.forEach(keyDrawer => keyDrawer.erase());  // draw every node unlit
 // s is scale degree (s mod length), and degree d is drawn by keyDrawers[d - 1]
 // (the root, degree 0, is the last drawer). See the scale format in
 // music/musicUtils.js.
-function createKeys(instrument, frequencies) {
-  return frequencies.map((frequency, i) => createKey(
+const keyList = KEY_CODE_LIST.map((_, i) => {
+  const steps = i - BASE_KEY_INDEX;
+  return createKey(
     audioContext,
-    frequency,
-    instrument,
-    keyDrawers[mod(i - BASE_KEY_INDEX - 1, SCALE.length)]
-  ));
-}
+    calculateFrequency(SCALE, BASE_FREQUENCY, steps),
+    INSTRUMENT,
+    keyDrawers[mod(steps - 1, SCALE.length)]
+  );
+});
 
-const synth = new Synth(
-  audioContext,
-  KEY_CODE_LIST,
-  createKeys(
-    INSTRUMENTS[DEFAULT_INSTRUMENT],
-    KEY_CODE_LIST.map((_, i) => calculateFrequency(SCALE, BASE_FREQUENCY, i - BASE_KEY_INDEX))
-  ),
-  filter
-);
+const synth = new Synth(audioContext, KEY_CODE_LIST, keyList, filter);
 
-/** Rebuilds every key with another instrument, keeping current pitches (and so any octave shift). */
-function switchInstrument(name) {
-  const instrument = INSTRUMENTS[name];
-  filter.frequency.value = instrument.lowpassCutoff;
-  synth.replaceKeys(createKeys(instrument, synth.keyList.map(key => key.frequency())));
-}
-
-// Instrument dropdown (index.html). It's mouse-only: a focused <select> would
-// otherwise treat arrow keys and typed letters (e.g. "S", "H") as choosing an
-// option, which would switch instruments while you play.
+// Instrument dropdown (index.html): choosing one reloads the page with it.
+// It ignores the keyboard, because a focused <select> treats arrow keys and
+// typed letters (e.g. "S", "H") as picking an option.
 const instrumentSelect = document.getElementById("instrumentSelect");
 Object.keys(INSTRUMENTS).forEach(name => {
   const option = document.createElement("option");
@@ -119,10 +111,9 @@ Object.keys(INSTRUMENTS).forEach(name => {
   option.textContent = name.charAt(0).toUpperCase() + name.slice(1);
   instrumentSelect.appendChild(option);
 });
-instrumentSelect.value = DEFAULT_INSTRUMENT;
+instrumentSelect.value = instrumentName;
 instrumentSelect.onchange = () => {
-  switchInstrument(instrumentSelect.value);
-  instrumentSelect.blur();
+  window.location.search = "?instrument=" + instrumentSelect.value;
 };
 instrumentSelect.onkeydown = event => event.preventDefault();
 

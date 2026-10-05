@@ -14,12 +14,12 @@ Sound (`audio/`) and drawing (`drawing/`) don't depend on each other. Only `scri
 
 | File | Role |
 |---|---|
-| `script.js` | Entry point. **All configuration is here** (scale, base frequency, default instrument, visualization mode); it also wires sound to drawing, fills the instrument dropdown, and handles input |
+| `script.js` | Entry point. **All configuration is here** (scale, base frequency, default instrument, visualization mode); it also wires sound to drawing, fills the instrument dropdown (which reloads the page with `?instrument=<name>`), and handles input |
 | `keyboardLayout.js` | `KEY_CODE_LIST`: the order of the physical keys, from lowest to highest pitch |
 | `music/musicUtils.js` | `mod` (floor modulo), cents/ratio math, `calculateFrequency`, scale builders (ET, EDO subsets, generator scales) |
 | `music/scales.js` | Library of named scales and note-name arrays |
 | `audio/synth.js` | `Synth`: maps key events to `Key`s and handles sustain (Space), volume (↑↓) and octave (←→); builds the audio graph |
-| `audio/instruments.js` | Instrument presets (`synth` = the original sawtooth, `harpsichord`), listed in the page dropdown; the field reference is at the top of the file. Switching rebuilds all keys (`Synth.replaceKeys`) |
+| `audio/instruments.js` | Instrument presets (`synth` = the original sawtooth, `harpsichord`), listed in the page dropdown; the field reference is at the top of the file |
 | `audio/key.js` | `Key`: one note; always-running oscillator(s) gated by a gain envelope, with optional decay and a per-note filter |
 | `audio/audioUtils.js` | Web Audio node factories |
 | `drawing/keyDrawer.js` | `NoteNode` (point + label) and `KeyDrawer` (lights the nodes for one scale degree) |
