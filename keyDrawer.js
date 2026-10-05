@@ -1,23 +1,48 @@
-class KeyDrawer {
-  constructor(context, coordinates, noteName) {
-    this.context = context;
+/** A labeled point on the canvas. */
+class NoteNode {
+  constructor(coordinates, label) {
     this.coordinates = coordinates;
-    this.noteName = noteName;
+    this.label = label;
+  }
+}
+
+const NODE_RADIUS = 12;
+const NODE_FONT = "12px Arial";
+const NODE_LABEL_COLOR = "RED";
+const NODE_ACTIVE_COLOR = "YELLOW";
+const NODE_INACTIVE_COLOR = "WHITE";
+
+/**
+ * Draws the on-screen node(s) for one scale degree, which light up while any
+ * key playing that degree is held. Several keys (the same degree in different
+ * octaves) share one KeyDrawer, so it stays lit until all of them are
+ * released. A degree can have several nodes (e.g. one pitch shown in several
+ * places on the Tonnetz).
+ */
+class KeyDrawer {
+  constructor(context, nodes) {
+    this.context = context;
+    this.nodes = nodes;
     this.activeKeys = new Set();
   }
 
   draw() {
-    drawCircle(this.context, this.coordinates, 12, "YELLOW");
-    writeText(this.context, this.coordinates, "12px Arial", "RED", this.noteName);
+    this.drawNodes(NODE_ACTIVE_COLOR);
   }
 
   erase() {
-    drawCircle(this.context, this.coordinates, 12, "WHITE");
-    writeText(this.context, this.coordinates, "12px Arial", "RED", this.noteName);
+    this.drawNodes(NODE_INACTIVE_COLOR);
+  }
+
+  drawNodes(fillColor) {
+    this.nodes.forEach(node => {
+      drawCircle(this.context, node.coordinates, NODE_RADIUS, fillColor);
+      writeText(this.context, node.coordinates, NODE_FONT, NODE_LABEL_COLOR, node.label);
+    });
   }
 
   press(key) {
-    if (this.activeKeys.size == 0) {
+    if (this.activeKeys.size === 0) {
       this.draw();
     }
     this.activeKeys.add(key);
@@ -25,16 +50,8 @@ class KeyDrawer {
 
   release(key) {
     this.activeKeys.delete(key);
-    if (this.activeKeys.size == 0) {
+    if (this.activeKeys.size === 0) {
       this.erase();
     }
   }
-}
-
-function createDummyKeyDrawer(context) {
-  return new KeyDrawer(
-    context,
-    new Coordinates(300, 300),
-    ""
-  )
 }

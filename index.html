@@ -1,32 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>js-synth</title>
+</head>
 <body>
 
   <canvas
     id="myCanvas"
     width="1300"
-    height=700"
+    height="700"
     style="border:1px solid #000000;">
   </canvas>
 
-<script src="constants.js"></script>
+<!-- Classic (non-module) scripts sharing one global scope; order matters. -->
 
-<script src="coordinates.js"></script>
-<script src="graphNode.js"></script>
-
+<!-- Generic helpers -->
 <script src="utils.js"></script>
+<script src="coordinates.js"></script>
 <script src="audioUtils.js"></script>
-<script src="musicUtils.js"></script>
 <script src="drawingUtils.js"></script>
 
+<!-- Tuning math and data -->
+<script src="musicUtils.js"></script>
+<script src="lattice.js"></script>
 <script src="scales.js"></script>
+<script src="constants.js"></script>
 
+<!-- Visualization -->
+<script src="keyDrawer.js"></script>
+<script src="tonnetz.js"></script>
+
+<!-- Sound -->
 <script src="key.js"></script>
 <script src="synth.js"></script>
 
-<script src="keyDrawer.js"></script>
-<script src="multiKeyDrawer.js"></script>
-
+<!-- Entry point: configuration and wiring -->
 <script src="script.js"></script>
 
 </body>
+</html>

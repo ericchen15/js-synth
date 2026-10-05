@@ -1,3 +1,11 @@
+// Tuning math.
+//
+// SCALE FORMAT (used throughout the project): a scale is an array of frequency
+// ratios relative to the root, in ascending order. The root itself (1/1) is
+// omitted and the last entry is the period (the interval at which the scale
+// repeats, usually ~2 for an octave). So scale[k] is scale degree k + 1, and
+// degree 0 is the root. Example, 12-TET: [2^(1/12), 2^(2/12), ..., 2].
+
 function centsToRatio(cents) {
   return Math.pow(2, cents / 1200);
 }
@@ -6,136 +14,55 @@ function ratioToCents(ratio) {
   return Math.log2(ratio) * 1200;
 }
 
+/** Shifts a ratio by whole periods until it lies in [1, periodRatio]. */
 function normalizeRatio(ratio, periodRatio) {
-  if (ratio < 1) {
-    while (ratio < 1) {
-      ratio *= periodRatio;
-    }
-  } else if (ratio > periodRatio) {
-    while (ratio > periodRatio) {
-      ratio /= periodRatio;
-    }
+  while (ratio < 1) {
+    ratio *= periodRatio;
+  }
+  while (ratio > periodRatio) {
+    ratio /= periodRatio;
   }
   return ratio;
 }
 
+/**
+ * Frequency of the note `offset` scale steps above baseFrequency (negative
+ * offsets go down). Steps past the end of the scale wrap into the next period.
+ */
 function calculateFrequency(scale, baseFrequency, offset) {
-  const scaleLength = scale.length;
   const periodRatio = scale[scale.length - 1];
   const periodsAboveBase = Math.floor(offset / scale.length);
-  const index = offset.mod(scale.length);
+  const degree = mod(offset, scale.length);
   const periodMultiplier = Math.pow(periodRatio, periodsAboveBase);
-  var scaleMultiplier = 1;
-  if (index > 0) {
-    scaleMultiplier = scale[index - 1];
-  }
-  return baseFrequency * periodMultiplier * scaleMultiplier;
+  const degreeMultiplier = degree > 0 ? scale[degree - 1] : 1;
+  return baseFrequency * periodMultiplier * degreeMultiplier;
 }
 
+/** Equal temperament: divides periodRatio into numTones equal steps. */
 function createEtScale(periodRatio, numTones) {
-  const EtScale = range(numTones).map(
-    i => Math.pow(periodRatio, i / numTones)
-  ).sort();
-  EtScale.shift();
-  EtScale.push(periodRatio);
-  return EtScale;
+  return range(numTones).map(i => Math.pow(periodRatio, (i + 1) / numTones));
 }
 
+/**
+ * A subset of an equal temperament. `degrees` are 1-based step numbers of the
+ * ET (the last one is normally numTones, i.e. the period).
+ */
 function createEdoScale(periodRatio, numTones, degrees) {
   const etScale = createEtScale(periodRatio, numTones);
-  var edoScale = [];
-  for (var i = 0; i < degrees.length; i++) {
-    var currDegree = degrees[i] - 1;
-    edoScale.push(etScale[currDegree]);
-  }
-  return edoScale;
+  return degrees.map(degree => etScale[degree - 1]);
 }
 
+/**
+ * A rank-2 (period + generator) scale: stacks numTones generators, with
+ * positionOfRoot of them below the root, and reduces each into one period.
+ * E.g. a fifth generator with positionOfRoot 3 gives the notes from E♭ (3
+ * fifths below C) up to G♯.
+ */
 function createGeneratorScale(periodRatio, generatorRatio, numTones, positionOfRoot) {
-  const generatorScale = range(numTones).map(
-    i => normalizeRatio(Math.pow(generatorRatio, i - positionOfRoot), periodRatio)
-  ).sort();
-  generatorScale.shift();
+  const generatorScale = range(numTones)
+    .map(i => normalizeRatio(Math.pow(generatorRatio, i - positionOfRoot), periodRatio))
+    .sort((a, b) => a - b);
+  generatorScale.shift(); // drop the root (1/1)
   generatorScale.push(periodRatio);
   return generatorScale;
-}
-
-function almostEqual(num1, num2) {
-  return 0.9999 < num2 / num1 && num2 / num1 < 1.0001;
-}
-
-function findConsonance(note1, note2, periodRatio, consonances) {
-  const intervalRatio = normalizeRatio(note2 / note1, periodRatio);
-  for (var i = 0; i < consonances.length; i++) {
-    var consonance = consonances[i];
-    if (almostEqual(intervalRatio, consonance)) {
-      return consonance;
-    }
-    var invertedConsonance = periodRatio / consonance;
-    if (almostEqual(intervalRatio, invertedConsonance)) {
-      return invertedConsonance;
-    }
-  }
-  return 0;
-}
-
-function getCoordinatesIfPossible(
-    scaleToCoordinates,
-    basisRatios,
-    basisDirections,
-    note,
-    periodRatio) {
-  for (var [knownNote, knownCoordinates] of scaleToCoordinates) {
-    var consonance = findConsonance(knownNote, note, periodRatio, basisRatios);
-    var consonanceIndex = basisRatios.indexOf(consonance);
-    if (consonanceIndex != -1) {
-      return knownCoordinates.add(basisDirections[consonanceIndex]);
-    }
-
-    const invertedBasisRatios = basisRatios.map(ratio => periodRatio / ratio);
-    consonanceIndex = invertedBasisRatios.indexOf(consonance);
-    if (consonanceIndex != -1) {
-      return knownCoordinates.subtract(basisDirections[consonanceIndex]);
-    }
-  }
-  return null;
-}
-
-function getAllCoordinates(scale, basisRatios, rootCoordinates, basisDirections) {
-  var scaleToCoordinates = new Map();
-  const periodRatio = scale[scale.length - 1];
-  scaleToCoordinates.set(periodRatio, rootCoordinates);
-
-  while (scaleToCoordinates.size < scale.length) {
-    for (var i = 0; i < scale.length; i++) {
-      var note = scale[i];
-      if (!scaleToCoordinates.has(note)) {
-        var possibleCoordinates = getCoordinatesIfPossible(
-          scaleToCoordinates, basisRatios, basisDirections, note, periodRatio
-        );
-        if (possibleCoordinates != null) {
-          scaleToCoordinates.set(note, possibleCoordinates);
-        }
-      }
-    }
-  }
-
-  return scaleToCoordinates;
-}
-
-function getAllConsonances(scale, consonances) {
-  var allConsonances = [];
-  const periodRatio = scale[scale.length - 1];
-
-  for (var i = 0; i < scale.length - 1; i++) {
-    var note1 = scale[i];
-    for (var j = i + 1; j < scale.length; j++) {
-      var note2 = scale[j];
-
-      if (findConsonance(note1, note2, periodRatio, consonances) > 0) {
-        allConsonances.push([note1, note2]);
-      }
-    }
-  }
-  return allConsonances;
 }

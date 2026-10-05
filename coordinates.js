@@ -1,3 +1,4 @@
+/** An immutable 2D point/vector in canvas pixels (y grows downward). */
 class Coordinates {
   constructor(x, y) {
     this.x = x;

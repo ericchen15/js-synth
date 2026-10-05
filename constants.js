@@ -1,3 +1,8 @@
+// Computer-keyboard layout. Each group of four is one diagonal column of the
+// keyboard, from the number row down to the bottom row, and the columns go
+// left to right. Each key is one scale step higher than the one before it, so
+// pitch goes up as you move down a column and then on to the next column to
+// the right. script.js decides which key plays the base frequency.
 const KEY_CODE_LIST = [
   "Backquote", "Tab", "CapsLock", "ShiftLeft",
   "Digit1", "KeyQ", "KeyA", "KeyZ",
@@ -12,10 +17,8 @@ const KEY_CODE_LIST = [
   "Digit0", "KeyP", "Semicolon", "Slash",
   "Minus", "BracketLeft", "Quote", "ShiftRight",
   "Equal", "BracketRight", "Enter"
-]
+];
 
-// pitches in Hz
+// Other base frequencies (Hz) to try for BASE_FREQUENCY in script.js.
 const A1 = 55;
 const WELL_TUNED_BASE = 74.6;
-
-const QUARTER_COMMA_FIFTH = Math.pow(5, 1/4);
