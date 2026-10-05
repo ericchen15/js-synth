@@ -17,14 +17,10 @@ const BASE_FREQUENCY = 130.81;     // Hz (C3)
 const BASE_KEY_INDEX = 10;         // KEY_CODE_LIST index that plays BASE_FREQUENCY ("KeyS")
 const DEFAULT_INSTRUMENT = "synth";  // preset (audio/instruments.js) the settings panel starts with
 
-// "tonnetz": the fixed 12-TET Tonnetz from drawing/tonnetz.js (highlights 12-note scales only).
-// "lattice": a lattice laid out automatically from LATTICE_SCALE by drawing/lattice.js, using
-//            the LATTICE_* settings below.
-const VISUALIZATION = "tonnetz";
-
-// Lattice mode only. LATTICE_NOTE_NAMES must line up 1:1 with LATTICE_SCALE.
-const LATTICE_SCALE = bigSevenScale;
-const LATTICE_NOTE_NAMES = bigSevenNames;
+// The canvas shows a diagram chosen by the selected scale (see SCALES in
+// music/scales.js): a JI lattice for scales with note names, using the
+// LATTICE_* settings below; the Tonnetz for other 12-note scales; otherwise
+// nothing.
 const LATTICE_BASIS_RATIOS = sevenBasisRatios;
 const LATTICE_CONSONANCES = sevenConsonances;  // pairs connected by lines
 const LATTICE_ROOT = new Coordinates(300, 300);
@@ -45,12 +41,12 @@ function createTonnetzKeyDrawers(canvasContext) {
   );
 }
 
-/** Lays out and draws a JI lattice for LATTICE_SCALE and returns one KeyDrawer per scale degree. */
-function createLatticeKeyDrawers(canvasContext) {
+/** Lays out and draws a JI lattice for a scale and returns one KeyDrawer per scale degree. */
+function createLatticeKeyDrawers(canvasContext, ratios, noteNames) {
   const scaleToCoordinates = getAllCoordinates(
-    LATTICE_SCALE, LATTICE_BASIS_RATIOS, LATTICE_ROOT, LATTICE_BASIS_DIRECTIONS);
+    ratios, LATTICE_BASIS_RATIOS, LATTICE_ROOT, LATTICE_BASIS_DIRECTIONS);
 
-  getAllConsonances(LATTICE_SCALE, LATTICE_CONSONANCES).forEach(([note1, note2]) =>
+  getAllConsonances(ratios, LATTICE_CONSONANCES).forEach(([note1, note2]) =>
     drawLine(
       canvasContext,
       scaleToCoordinates.get(note1),
@@ -59,11 +55,29 @@ function createLatticeKeyDrawers(canvasContext) {
     )
   );
 
-  return LATTICE_SCALE.map((note, i) =>
+  return ratios.map((note, i) =>
     new KeyDrawer(canvasContext, [
-      new NoteNode(scaleToCoordinates.get(note), LATTICE_NOTE_NAMES[i])
+      new NoteNode(scaleToCoordinates.get(note), noteNames[i])
     ])
   );
+}
+
+/**
+ * Clears the canvas, draws the diagram that fits `scale` (an entry of SCALES),
+ * and returns its KeyDrawers, one per scale degree, or [] if nothing fits.
+ */
+function drawVisualization(scale) {
+  canvasContext.clearRect(0, 0, canvasContext.canvas.width, canvasContext.canvas.height);
+  canvasContext.beginPath();  // drawLine never starts a new path (see drawing/drawingUtils.js)
+
+  let drawers = [];
+  if (scale.noteNames) {
+    drawers = createLatticeKeyDrawers(canvasContext, scale.ratios, scale.noteNames);
+  } else if (scale.ratios.length === 12) {
+    drawers = createTonnetzKeyDrawers(canvasContext);
+  }
+  drawers.forEach(keyDrawer => keyDrawer.erase());  // draw every node unlit
+  return drawers;
 }
 
 // ---- Setup ----
@@ -78,36 +92,33 @@ let currentSettings = createSettingsPanel(
 let currentScale = SCALES[createScaleSelector(
   document.getElementById("scalePanel"), SCALES, DEFAULT_SCALE, name => {
     currentScale = SCALES[name];
-    logScale(currentScale);
+    logScale(currentScale.ratios);
+    keyDrawers = drawVisualization(currentScale);
     rebuildKeys();
   })];
-logScale(currentScale);
+logScale(currentScale.ratios);
 
 const audioContext = new window.AudioContext();
 const filter = createFilter(audioContext, "lowpass", currentSettings.lowpassCutoff);
 
 const canvasContext = document.getElementById("myCanvas").getContext("2d");
-const keyDrawers = VISUALIZATION === "lattice"
-  ? createLatticeKeyDrawers(canvasContext)
-  : createTonnetzKeyDrawers(canvasContext);
-keyDrawers.forEach(keyDrawer => keyDrawer.erase());  // draw every node unlit
+let keyDrawers = drawVisualization(currentScale);
 
 // Key i is `i - BASE_KEY_INDEX` scale steps above BASE_FREQUENCY. A step count
 // s is scale degree (s mod length), and degree d is drawn by keyDrawers[d - 1]
 // (the root, degree 0, is the last drawer). See the scale format in
-// music/musicUtils.js. The drawers only fit a scale with as many notes as
-// there are drawers (12 for the Tonnetz); other scales play without highlighting.
+// music/musicUtils.js. Scales without a diagram play without highlighting.
 const NO_HIGHLIGHT = { press() {}, release() {} };
 
 function createKeys() {
-  const highlight = currentScale.length === keyDrawers.length;
+  const ratios = currentScale.ratios;
   return KEY_CODE_LIST.map((_, i) => {
     const steps = i - BASE_KEY_INDEX;
     return createKey(
       audioContext,
-      calculateFrequency(currentScale, BASE_FREQUENCY, steps),
+      calculateFrequency(ratios, BASE_FREQUENCY, steps),
       currentSettings,
-      highlight ? keyDrawers[mod(steps - 1, currentScale.length)] : NO_HIGHLIGHT
+      keyDrawers.length > 0 ? keyDrawers[mod(steps - 1, ratios.length)] : NO_HIGHLIGHT
     );
   });
 }

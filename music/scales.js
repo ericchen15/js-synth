@@ -50,23 +50,25 @@ const topMeantone12Scale = createGeneratorScale(centsToRatio(1201.7), centsToRat
 const werckmeisterScale = [90.2, 192.2, 294.1, 390.2, 498.0, 588.3, 696.1, 792.2, 888.3, 996.1, 1092.2, 1200]
   .map(centsToRatio);
 
-// Scales offered in the scale dropdown on the page, by display name.
+// Scales offered in the scale dropdown on the page, by display name. A scale
+// with noteNames (one per ratio) is drawn as a JI lattice; any other 12-note
+// scale is drawn on the Tonnetz; anything else gets a blank canvas.
 const SCALES = {
-  "12-TET": tet12Scale,
-  "10-TET": tet10Scale,
-  "Quarter-comma meantone": meantoneScale,
-  "TOP meantone 12": topMeantone12Scale,
-  "Werckmeister": werckmeisterScale,
-  "5-limit JI": fiveLimitScale,
-  "7-limit JI": sevenScale,
-  "7-limit JI (tempered)": temperedSevenScale,
-  "7-limit JI 2": sevenScale2,
-  "7-limit JI (16 notes)": bigSevenScale,
-  "Well-Tuned Piano": wellTunedScale,
-  "Harmonic": harmonicScale,
-  "Bohlen-Pierce lambda": lambdaScale,
-  "Rast": rastScale,
-  "31-EDO experimental": edo31ExperimentalScale,
-  "Blackjack (72-EDO)": blackjackScale,
-  "Pajara 10 (22-EDO)": pajara10Scale,
+  "12-TET": { ratios: tet12Scale },
+  "10-TET": { ratios: tet10Scale },
+  "Quarter-comma meantone": { ratios: meantoneScale },
+  "TOP meantone 12": { ratios: topMeantone12Scale },
+  "Werckmeister": { ratios: werckmeisterScale },
+  "5-limit JI": { ratios: fiveLimitScale },
+  "7-limit JI": { ratios: sevenScale, noteNames: sevenNames },
+  "7-limit JI (tempered)": { ratios: temperedSevenScale },
+  "7-limit JI 2": { ratios: sevenScale2, noteNames: sevenNames2 },
+  "7-limit JI (16 notes)": { ratios: bigSevenScale, noteNames: bigSevenNames },
+  "Well-Tuned Piano": { ratios: wellTunedScale },
+  "Harmonic": { ratios: harmonicScale },
+  "Bohlen-Pierce lambda": { ratios: lambdaScale },
+  "Rast": { ratios: rastScale },
+  "31-EDO experimental": { ratios: edo31ExperimentalScale },
+  "Blackjack (72-EDO)": { ratios: blackjackScale },
+  "Pajara 10 (22-EDO)": { ratios: pajara10Scale },
 };
