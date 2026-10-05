@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>js-synth</title>
   <style>
-    #settingsPanel { margin-bottom: 8px; font-family: Arial, sans-serif; font-size: 13px; }
+    #settingsPanel, #scalePanel { margin-bottom: 8px; font-family: Arial, sans-serif; font-size: 13px; }
     #settingsPanel .settingGroups { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
     #settingsPanel fieldset { display: flex; flex-direction: column; gap: 4px; margin: 0; }
     #settingsPanel fieldset label { display: flex; justify-content: space-between; gap: 8px; }
@@ -14,6 +14,7 @@
 <body>
 
   <div id="settingsPanel"></div>  <!-- filled in by settingsPanel.js -->
+  <div id="scalePanel"></div>     <!-- filled in by settingsPanel.js -->
 
 
   <canvas

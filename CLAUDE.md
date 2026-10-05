@@ -20,7 +20,7 @@ Sound (`audio/`) and drawing (`drawing/`) don't depend on each other. Only `scri
 | `music/scales.js` | Library of named scales and note-name arrays |
 | `audio/synth.js` | `Synth`: maps key events to `Key`s and handles sustain (Space), volume (↑↓) and octave (←→); builds the audio graph |
 | `audio/instruments.js` | Instrument presets (`synth` = the original sawtooth, `harpsichord`); the field reference is at the top of the file |
-| `settingsPanel.js` | Settings panel above the canvas: instrument dropdown + an input per preset field. Any change rebuilds all keys (`Synth.replaceKeys`) |
+| `settingsPanel.js` | Panels above the canvas: instrument dropdown + an input per preset field, and the scale dropdown (scales registered in `SCALES` in `music/scales.js`). Any change rebuilds all keys (`rebuildKeys` in `script.js`) |
 | `audio/key.js` | `Key`: one note; always-running oscillator(s) gated by a gain envelope, with optional decay and a per-note filter |
 | `audio/audioUtils.js` | Web Audio node factories |
 | `drawing/keyDrawer.js` | `NoteNode` (point + label) and `KeyDrawer` (lights the nodes for one scale degree) |

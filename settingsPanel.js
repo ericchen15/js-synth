@@ -144,6 +144,21 @@ function createSettingsPanel(container, instruments, initialInstrument, onChange
   return settings;
 }
 
+/**
+ * Builds a scale dropdown inside `container` listing the names in `scales`.
+ * Calls onChange(name) when another scale is picked, and returns the initial name.
+ */
+function createScaleSelector(container, scales, initialScale, onChange) {
+  const select = createSelect(Object.keys(scales));
+  select.value = initialScale;
+  select.onchange = () => {
+    onChange(select.value);
+    select.blur();  // give the keyboard back to the synth
+  };
+  container.appendChild(createLabeled("Scale", select));
+  return initialScale;
+}
+
 function createSelect(values) {
   const select = document.createElement("select");
   values.forEach(value => {

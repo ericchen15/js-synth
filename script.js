@@ -12,17 +12,18 @@
 
 // ---- Configuration ----
 
-const SCALE = tet12Scale;          // any scale from scales.js
+const DEFAULT_SCALE = "12-TET";    // name in SCALES (music/scales.js) the scale dropdown starts with
 const BASE_FREQUENCY = 130.81;     // Hz (C3)
 const BASE_KEY_INDEX = 10;         // KEY_CODE_LIST index that plays BASE_FREQUENCY ("KeyS")
 const DEFAULT_INSTRUMENT = "synth";  // preset (audio/instruments.js) the settings panel starts with
 
-// "tonnetz": the fixed 12-TET Tonnetz from drawing/tonnetz.js (SCALE must have 12 notes).
-// "lattice": a lattice laid out automatically from SCALE by drawing/lattice.js, using
+// "tonnetz": the fixed 12-TET Tonnetz from drawing/tonnetz.js (highlights 12-note scales only).
+// "lattice": a lattice laid out automatically from LATTICE_SCALE by drawing/lattice.js, using
 //            the LATTICE_* settings below.
 const VISUALIZATION = "tonnetz";
 
-// Lattice mode only. LATTICE_NOTE_NAMES must line up 1:1 with SCALE.
+// Lattice mode only. LATTICE_NOTE_NAMES must line up 1:1 with LATTICE_SCALE.
+const LATTICE_SCALE = bigSevenScale;
 const LATTICE_NOTE_NAMES = bigSevenNames;
 const LATTICE_BASIS_RATIOS = sevenBasisRatios;
 const LATTICE_CONSONANCES = sevenConsonances;  // pairs connected by lines
@@ -44,12 +45,12 @@ function createTonnetzKeyDrawers(canvasContext) {
   );
 }
 
-/** Lays out and draws a JI lattice for SCALE and returns one KeyDrawer per scale degree. */
+/** Lays out and draws a JI lattice for LATTICE_SCALE and returns one KeyDrawer per scale degree. */
 function createLatticeKeyDrawers(canvasContext) {
   const scaleToCoordinates = getAllCoordinates(
-    SCALE, LATTICE_BASIS_RATIOS, LATTICE_ROOT, LATTICE_BASIS_DIRECTIONS);
+    LATTICE_SCALE, LATTICE_BASIS_RATIOS, LATTICE_ROOT, LATTICE_BASIS_DIRECTIONS);
 
-  getAllConsonances(SCALE, LATTICE_CONSONANCES).forEach(([note1, note2]) =>
+  getAllConsonances(LATTICE_SCALE, LATTICE_CONSONANCES).forEach(([note1, note2]) =>
     drawLine(
       canvasContext,
       scaleToCoordinates.get(note1),
@@ -58,7 +59,7 @@ function createLatticeKeyDrawers(canvasContext) {
     )
   );
 
-  return SCALE.map((note, i) =>
+  return LATTICE_SCALE.map((note, i) =>
     new KeyDrawer(canvasContext, [
       new NoteNode(scaleToCoordinates.get(note), LATTICE_NOTE_NAMES[i])
     ])
@@ -67,14 +68,23 @@ function createLatticeKeyDrawers(canvasContext) {
 
 // ---- Setup ----
 
-const initialSettings = createSettingsPanel(
-  document.getElementById("settingsPanel"), INSTRUMENTS, DEFAULT_INSTRUMENT, applySettings);
+// What the keys are currently built from; changed by the panels above the canvas.
+let currentSettings = createSettingsPanel(
+  document.getElementById("settingsPanel"), INSTRUMENTS, DEFAULT_INSTRUMENT, settings => {
+    currentSettings = settings;
+    filter.frequency.value = settings.lowpassCutoff;
+    rebuildKeys();
+  });
+let currentScale = SCALES[createScaleSelector(
+  document.getElementById("scalePanel"), SCALES, DEFAULT_SCALE, name => {
+    currentScale = SCALES[name];
+    logScale(currentScale);
+    rebuildKeys();
+  })];
+logScale(currentScale);
 
 const audioContext = new window.AudioContext();
-const filter = createFilter(audioContext, "lowpass", initialSettings.lowpassCutoff);
-
-console.log(SCALE);
-console.log(SCALE.map(ratioToCents));
+const filter = createFilter(audioContext, "lowpass", currentSettings.lowpassCutoff);
 
 const canvasContext = document.getElementById("myCanvas").getContext("2d");
 const keyDrawers = VISUALIZATION === "lattice"
@@ -85,29 +95,37 @@ keyDrawers.forEach(keyDrawer => keyDrawer.erase());  // draw every node unlit
 // Key i is `i - BASE_KEY_INDEX` scale steps above BASE_FREQUENCY. A step count
 // s is scale degree (s mod length), and degree d is drawn by keyDrawers[d - 1]
 // (the root, degree 0, is the last drawer). See the scale format in
-// music/musicUtils.js.
-function createKeys(settings) {
+// music/musicUtils.js. The drawers only fit a scale with as many notes as
+// there are drawers (12 for the Tonnetz); other scales play without highlighting.
+const NO_HIGHLIGHT = { press() {}, release() {} };
+
+function createKeys() {
+  const highlight = currentScale.length === keyDrawers.length;
   return KEY_CODE_LIST.map((_, i) => {
     const steps = i - BASE_KEY_INDEX;
     return createKey(
       audioContext,
-      calculateFrequency(SCALE, BASE_FREQUENCY, steps),
-      settings,
-      keyDrawers[mod(steps - 1, SCALE.length)]
+      calculateFrequency(currentScale, BASE_FREQUENCY, steps),
+      currentSettings,
+      highlight ? keyDrawers[mod(steps - 1, currentScale.length)] : NO_HIGHLIGHT
     );
   });
 }
 
-const synth = new Synth(audioContext, KEY_CODE_LIST, createKeys(initialSettings), filter);
+const synth = new Synth(audioContext, KEY_CODE_LIST, createKeys(), filter);
 
 /**
- * Called by the settings panel on every change: rebuilds all keys. Playing
- * notes stop and any octave shift resets; the master volume is kept.
+ * Rebuilds all keys from currentSettings and currentScale. Playing notes stop
+ * and any octave shift resets; the master volume is kept.
  */
-function applySettings(settings) {
-  filter.frequency.value = settings.lowpassCutoff;
-  synth.replaceKeys(createKeys(settings));
+function rebuildKeys() {
+  synth.replaceKeys(createKeys());
   keyDrawers.forEach(keyDrawer => keyDrawer.reset());
+}
+
+function logScale(scale) {
+  console.log(scale);
+  console.log(scale.map(ratioToCents));
 }
 
 // ---- Input ----

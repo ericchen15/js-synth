@@ -1,5 +1,5 @@
 // Library of scales. See music/musicUtils.js for the format: ratios above the root,
-// root omitted, last entry = period. Pick one with SCALE in script.js.
+// root omitted, last entry = period. Add new ones to SCALES at the bottom to list them in the scale dropdown.
 //
 // Some periods are written as 2.0001 or 2.001 instead of 2, which makes the
 // "octave" very slightly wide. Changing them changes the tuning, so don't
@@ -49,3 +49,24 @@ const meantoneScale = createGeneratorScale(2, QUARTER_COMMA_FIFTH, 12, 3);
 const topMeantone12Scale = createGeneratorScale(centsToRatio(1201.7), centsToRatio(1899.26), 12, 3);
 const werckmeisterScale = [90.2, 192.2, 294.1, 390.2, 498.0, 588.3, 696.1, 792.2, 888.3, 996.1, 1092.2, 1200]
   .map(centsToRatio);
+
+// Scales offered in the scale dropdown on the page, by display name.
+const SCALES = {
+  "12-TET": tet12Scale,
+  "10-TET": tet10Scale,
+  "Quarter-comma meantone": meantoneScale,
+  "TOP meantone 12": topMeantone12Scale,
+  "Werckmeister": werckmeisterScale,
+  "5-limit JI": fiveLimitScale,
+  "7-limit JI": sevenScale,
+  "7-limit JI (tempered)": temperedSevenScale,
+  "7-limit JI 2": sevenScale2,
+  "7-limit JI (16 notes)": bigSevenScale,
+  "Well-Tuned Piano": wellTunedScale,
+  "Harmonic": harmonicScale,
+  "Bohlen-Pierce lambda": lambdaScale,
+  "Rast": rastScale,
+  "31-EDO experimental": edo31ExperimentalScale,
+  "Blackjack (72-EDO)": blackjackScale,
+  "Pajara 10 (22-EDO)": pajara10Scale,
+};
