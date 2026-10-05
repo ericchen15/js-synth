@@ -37,4 +37,4 @@ Sound (`audio/`) and drawing (`drawing/`) don't depend on each other. Only `scri
 
 ## Verifying changes
 
-The user tests changes by playing them, so keep verification light: make the change, commit and push, and say what to try. Don't build test harnesses or render audio unless asked. If a quick check helps, headless Chrome is at `C:Program FilesGoogleChromeApplicationrome.exe` (`--headless=new --allow-file-access-from-files --dump-dom`). Node is not installed.
+The user tests changes by playing them, so keep verification light: make the change, commit and push, and say what to try. Don't build test harnesses or render audio unless asked. If a quick check helps, headless Chrome is at `C:/Program Files/Google/Chrome/Application/chrome.exe` (`--headless=new --allow-file-access-from-files --dump-dom`). Node is not installed.
