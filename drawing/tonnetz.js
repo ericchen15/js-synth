@@ -22,7 +22,7 @@ const TONNETZ_ROWS = [
 
 // Tonnetz nodes for each scale degree of tet12Scale. Entry d is scale[d], i.e.
 // degree d + 1, so the list starts at C♯ and ends with the root C (see the
-// scale format in musicUtils.js).
+// scale format in music/musicUtils.js).
 const TONNETZ_NODES_BY_DEGREE = [
   ["C♯", "D♭"],
   ["D", "D-"],

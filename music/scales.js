@@ -1,4 +1,4 @@
-// Library of scales. See musicUtils.js for the format: ratios above the root,
+// Library of scales. See music/musicUtils.js for the format: ratios above the root,
 // root omitted, last entry = period. Pick one with SCALE in script.js.
 //
 // Some periods are written as 2.0001 or 2.001 instead of 2, which makes the

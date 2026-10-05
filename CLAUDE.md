@@ -8,20 +8,24 @@ There is no build step and there are no dependencies. Open `index.html` in a bro
 
 ## Architecture
 
-The files are plain classic `<script>`s that share one global scope (no modules). **Load order in `index.html` matters**: a file can only use, at load time, globals defined by files loaded before it. For example, `scales.js` calls `createEtScale` from `musicUtils.js`, and `script.js` is loaded last. Top-level `const` names have to be unique across all files.
+The files are plain classic `<script>`s that share one global scope (no modules). **Load order in `index.html` matters**: a file can only use, at load time, globals defined by files loaded before it. For example, `music/scales.js` calls `createEtScale` from `music/musicUtils.js`, and `script.js` is loaded last. Top-level `const` names have to be unique across all files.
+
+Sound (`audio/`) and drawing (`drawing/`) don't depend on each other. Only `script.js` connects them, by passing each `Key` a `KeyDrawer` as its `listener` (any object with `press(key)` / `release(key)`). Both sides use `music/`.
 
 | File | Role |
 |---|---|
-| `script.js` | Entry point. **All configuration is here** (scale, base frequency, wave, filter, visualization mode); it also wires everything together and handles input |
-| `synth.js` | `Synth`: maps key events to `Key`s and handles sustain (Space), volume (↑↓) and octave (←→); builds the audio graph |
-| `key.js` | `Key`: one note; an always-running oscillator gated by a gain envelope |
-| `constants.js` | `KEY_CODE_LIST`: the order of the physical keys, from lowest to highest pitch |
-| `musicUtils.js` | Cents/ratio math, `calculateFrequency`, scale builders (ET, EDO subsets, generator scales) |
-| `scales.js` | Library of named scales and note-name arrays |
-| `lattice.js` | Automatic 2D layout of a JI scale from basis intervals (lattice mode) |
-| `tonnetz.js` | Fixed 12-TET Tonnetz layout and its scale-degree → node mapping (default mode) |
-| `keyDrawer.js` | `NoteNode` (point + label) and `KeyDrawer` (lights the nodes for one scale degree) |
-| `drawingUtils.js`, `audioUtils.js`, `coordinates.js`, `utils.js` | Small helpers |
+| `script.js` | Entry point. **All configuration is here** (scale, base frequency, wave, filter, visualization mode); it also wires sound to drawing and handles input |
+| `keyboardLayout.js` | `KEY_CODE_LIST`: the order of the physical keys, from lowest to highest pitch |
+| `utils.js` | Generic helpers (`mod`, `range`, `dictFromArrays`) |
+| `music/musicUtils.js` | Cents/ratio math, `calculateFrequency`, scale builders (ET, EDO subsets, generator scales) |
+| `music/scales.js` | Library of named scales and note-name arrays |
+| `audio/synth.js` | `Synth`: maps key events to `Key`s and handles sustain (Space), volume (↑↓) and octave (←→); builds the audio graph |
+| `audio/key.js` | `Key`: one note; an always-running oscillator gated by a gain envelope |
+| `audio/audioUtils.js` | Web Audio node factories |
+| `drawing/keyDrawer.js` | `NoteNode` (point + label) and `KeyDrawer` (lights the nodes for one scale degree) |
+| `drawing/tonnetz.js` | Fixed 12-TET Tonnetz layout and its scale-degree → node mapping (default mode) |
+| `drawing/lattice.js` | Automatic 2D layout of a JI scale from basis intervals (lattice mode) |
+| `drawing/drawingUtils.js`, `drawing/coordinates.js` | Canvas primitives and a 2D point class |
 
 ## Key conventions
 

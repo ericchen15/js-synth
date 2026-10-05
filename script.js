@@ -2,7 +2,7 @@
 // configuration below, draws the note visualization, and hooks up input.
 //
 // Controls:
-//   note keys           play notes (see KEY_CODE_LIST in constants.js)
+//   note keys           play notes (see KEY_CODE_LIST in keyboardLayout.js)
 //   Space               sustain: notes pressed while Space is down keep
 //                       sounding until the next Space press
 //   ArrowUp / Down      master volume up / down
@@ -18,8 +18,8 @@ const BASE_KEY_INDEX = 10;         // KEY_CODE_LIST index that plays BASE_FREQUE
 const WAVE_TYPE = "sawtooth";      // OscillatorNode type
 const LOWPASS_CUTOFF = 6000;       // Hz
 
-// "tonnetz": the fixed 12-TET Tonnetz from tonnetz.js (SCALE must have 12 notes).
-// "lattice": a lattice laid out automatically from SCALE by lattice.js, using
+// "tonnetz": the fixed 12-TET Tonnetz from drawing/tonnetz.js (SCALE must have 12 notes).
+// "lattice": a lattice laid out automatically from SCALE by drawing/lattice.js, using
 //            the LATTICE_* settings below.
 const VISUALIZATION = "tonnetz";
 
@@ -84,7 +84,7 @@ keyDrawers.forEach(keyDrawer => keyDrawer.erase());  // draw every node unlit
 // Key i is `i - BASE_KEY_INDEX` scale steps above BASE_FREQUENCY. A step count
 // s is scale degree (s mod length), and degree d is drawn by keyDrawers[d - 1]
 // (the root, degree 0, is the last drawer). See the scale format in
-// musicUtils.js.
+// music/musicUtils.js.
 const keyList = KEY_CODE_LIST.map((_, i) => {
   const steps = i - BASE_KEY_INDEX;
   return createKey(

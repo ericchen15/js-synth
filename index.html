@@ -15,25 +15,24 @@
 
 <!-- Classic (non-module) scripts sharing one global scope; order matters. -->
 
-<!-- Generic helpers -->
 <script src="utils.js"></script>
-<script src="coordinates.js"></script>
-<script src="audioUtils.js"></script>
-<script src="drawingUtils.js"></script>
+<script src="keyboardLayout.js"></script>
 
-<!-- Tuning math and data -->
-<script src="musicUtils.js"></script>
-<script src="lattice.js"></script>
-<script src="scales.js"></script>
-<script src="constants.js"></script>
-
-<!-- Visualization -->
-<script src="keyDrawer.js"></script>
-<script src="tonnetz.js"></script>
+<!-- Tuning math and scales (used by both sound and drawing) -->
+<script src="music/musicUtils.js"></script>
+<script src="music/scales.js"></script>
 
 <!-- Sound -->
-<script src="key.js"></script>
-<script src="synth.js"></script>
+<script src="audio/audioUtils.js"></script>
+<script src="audio/key.js"></script>
+<script src="audio/synth.js"></script>
+
+<!-- Drawing -->
+<script src="drawing/coordinates.js"></script>
+<script src="drawing/drawingUtils.js"></script>
+<script src="drawing/keyDrawer.js"></script>
+<script src="drawing/tonnetz.js"></script>
+<script src="drawing/lattice.js"></script>
 
 <!-- Entry point: configuration and wiring -->
 <script src="script.js"></script>
