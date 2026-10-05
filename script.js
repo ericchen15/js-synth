@@ -15,8 +15,7 @@
 const SCALE = tet12Scale;          // any scale from scales.js
 const BASE_FREQUENCY = 130.81;     // Hz (C3)
 const BASE_KEY_INDEX = 10;         // KEY_CODE_LIST index that plays BASE_FREQUENCY ("KeyS")
-const WAVE_TYPE = "sawtooth";      // OscillatorNode type
-const LOWPASS_CUTOFF = 6000;       // Hz
+const INSTRUMENT = INSTRUMENTS.synth;  // any preset from audio/instruments.js
 
 // "tonnetz": the fixed 12-TET Tonnetz from drawing/tonnetz.js (SCALE must have 12 notes).
 // "lattice": a lattice laid out automatically from SCALE by drawing/lattice.js, using
@@ -69,7 +68,7 @@ function createLatticeKeyDrawers(canvasContext) {
 // ---- Setup ----
 
 const audioContext = new window.AudioContext();
-const filter = createFilter(audioContext, "lowpass", LOWPASS_CUTOFF);
+const filter = createFilter(audioContext, "lowpass", INSTRUMENT.lowpassCutoff);
 
 console.log(SCALE);
 console.log(SCALE.map(ratioToCents));
@@ -89,7 +88,7 @@ const keyList = KEY_CODE_LIST.map((_, i) => {
   return createKey(
     audioContext,
     calculateFrequency(SCALE, BASE_FREQUENCY, steps),
-    WAVE_TYPE,
+    INSTRUMENT,
     keyDrawers[mod(steps - 1, SCALE.length)]
   );
 });

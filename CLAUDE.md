@@ -14,12 +14,13 @@ Sound (`audio/`) and drawing (`drawing/`) don't depend on each other. Only `scri
 
 | File | Role |
 |---|---|
-| `script.js` | Entry point. **All configuration is here** (scale, base frequency, wave, filter, visualization mode); it also wires sound to drawing and handles input |
+| `script.js` | Entry point. **All configuration is here** (scale, base frequency, instrument, visualization mode); it also wires sound to drawing and handles input |
 | `keyboardLayout.js` | `KEY_CODE_LIST`: the order of the physical keys, from lowest to highest pitch |
 | `music/musicUtils.js` | `mod` (floor modulo), cents/ratio math, `calculateFrequency`, scale builders (ET, EDO subsets, generator scales) |
 | `music/scales.js` | Library of named scales and note-name arrays |
 | `audio/synth.js` | `Synth`: maps key events to `Key`s and handles sustain (Space), volume (↑↓) and octave (←→); builds the audio graph |
-| `audio/key.js` | `Key`: one note; an always-running oscillator gated by a gain envelope |
+| `audio/instruments.js` | Instrument presets (`synth` = the original sawtooth, `harpsichord`); the field reference is at the top of the file |
+| `audio/key.js` | `Key`: one note; always-running oscillator(s) gated by a gain envelope, with optional decay and a per-note filter |
 | `audio/audioUtils.js` | Web Audio node factories |
 | `drawing/keyDrawer.js` | `NoteNode` (point + label) and `KeyDrawer` (lights the nodes for one scale degree) |
 | `drawing/tonnetz.js` | Fixed 12-TET Tonnetz layout and its scale-degree → node mapping (default mode) |

@@ -8,6 +8,16 @@ function createOscillator(context, frequency, type) {
   return oscillator;
 }
 
+/**
+ * Creates a PeriodicWave (for oscillator.setPeriodicWave) from sine-harmonic
+ * amplitudes [h1, h2, ...]. The browser normalizes its peak level.
+ */
+function createPeriodicWave(context, harmonics) {
+  const imag = new Float32Array([0, ...harmonics]);
+  const real = new Float32Array(imag.length);
+  return context.createPeriodicWave(real, imag);
+}
+
 /** Creates a gain node that starts silent (gain 0). */
 function createGainNode(context) {
   const gainNode = context.createGain();
