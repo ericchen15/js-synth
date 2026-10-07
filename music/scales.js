@@ -13,7 +13,8 @@ const WELL_TUNED_BASE = 74.6;  // presumably meant for wellTunedScale
 const harmonicScale = [9/8, 10/8, 11/8, 12/8, 13/8, 14/8, 15/8, 16/8];
 const lambdaScale = [25/21, 9/7, 7/5, 5/3, 9/5, 15/7, 7/3, 25/9, 3/1];  // Bohlen-Pierce (period 3/1)
 const wellTunedScale = [567/512, 9/8, 147/128, 21/16, 1323/1024, 189/128, 3/2, 49/32, 7/4, 441/256, 63/32, 2/1];
-const fiveLimitScale = [16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8, 2/1];
+const fiveRatios = [16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8, 2/1];
+const fiveNames = ["D♭", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B", "C"];
 
 // 7-limit JI. Each *Names array lines up 1:1 with the matching scale and
 // provides the labels in lattice mode.
@@ -29,6 +30,8 @@ const sevenScale2 = [9/8, 7/6, 5/4, 21/16, 4/3, 45/32, 3/2, 5/3, 27/16, 7/4, 15/
 const sevenNames2 = ["D", "E\u{266D}7", "E", "F7+", "F", "F\u{266F}+", "G", "A", "A+", "B\u{266D}7", "B", "C"];
 const bigSevenScale = [21/20, 16/15, 9/8, 7/6, 6/5, 5/4, 21/16, 4/3, 7/5, 3/2, 8/5, 5/3, 7/4, 9/5, 15/8, 2.0001];
 const bigSevenNames = ["D\u{266D}7", "D\u{266D}-", "D", "E\u{266D}7", "E\u{266D}", "E", "F7+",  "F", "G\u{266D}7", "G", "A\u{266D}", "A", "B\u{266D}7", "B\u{266D}", "B", "C"];
+const threeSevenRatios = [9/8, 7/6, 21/16, 4/3, 3/2, 14/9, 7/4, 2.0001];
+const threeSevenNames = ["D", "E♭7", "F7+", "F", "G", "A♭7", "B♭7", "C"];
 
 // Equal temperaments
 const tet12Scale = createEtScale(2.001, 12);
@@ -59,11 +62,12 @@ const SCALES = {
   "Quarter-comma meantone": { ratios: meantoneScale },
   "TOP meantone 12": { ratios: topMeantone12Scale },
   "Werckmeister": { ratios: werckmeisterScale },
-  "5-limit JI": { ratios: fiveLimitScale },
+  "5-limit JI": { ratios: fiveRatios, noteNames: fiveNames },
   "7-limit JI": { ratios: sevenScale, noteNames: sevenNames },
   "7-limit JI (tempered)": { ratios: temperedSevenScale },
   "7-limit JI 2": { ratios: sevenScale2, noteNames: sevenNames2 },
   "7-limit JI (16 notes)": { ratios: bigSevenScale, noteNames: bigSevenNames },
+  "3-7 (8 notes)": {ratios: threeSevenRatios, noteNames: threeSevenNames},
   "Well-Tuned Piano": { ratios: wellTunedScale },
   "Harmonic": { ratios: harmonicScale },
   "Bohlen-Pierce lambda": { ratios: lambdaScale },
