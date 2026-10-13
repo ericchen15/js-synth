@@ -33,7 +33,7 @@ Sound (`audio/`) and drawing (`drawing/`) don't depend on each other. Only `scri
 - **Scale format:** an array of ratios above the root, ascending, with the root (1/1) **omitted** and the **period last** (e.g. 12-TET is `[2^(1/12), ..., 2]`). So `scale[k]` is degree `k + 1`, and degree 0 is the root. Most of the off-by-one arithmetic (such as `keyDrawers[mod(steps - 1, n)]`) comes from this.
 - Key `i` in `KEY_CODE_LIST` plays `i - BASE_KEY_INDEX` scale steps above `BASE_FREQUENCY`.
 - There is one `KeyDrawer` per scale degree, shared by every key that plays that degree in any octave. In Tonnetz mode the scale must have exactly 12 notes.
-- Some periods are deliberately `2.001` / `2.0001` (slightly stretched octaves). Don't normalize them to 2.
+- Most periods are deliberately `2.001` (a slightly stretched octave). Don't normalize them to 2. The lattice's interval matching (`almostEqual` in `drawing/lattice.js`) is loose enough (0.1%) to treat 2.001 as an octave.
 - `drawLine` deliberately doesn't call `beginPath()`. The overdraw is what makes the grid lines solid; changing it changes how they look.
 
 ## Verifying changes

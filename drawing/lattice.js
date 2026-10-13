@@ -6,9 +6,14 @@
 // (that note + basisDirections[k]), and if it's the inverse of
 // basisRatios[k] it goes at (that note - basisDirections[k]).
 
-/** True if two positive numbers are within ~0.01% of each other. */
+/**
+ * True if two positive numbers are within ~0.1% (about 1.7 cents) of each
+ * other. That is loose enough to treat a stretched period (e.g. 2.001) as an
+ * octave when matching inverted intervals, and much tighter than the gap
+ * between any two intervals the lattice uses.
+ */
 function almostEqual(num1, num2) {
-  return 0.9999 < num2 / num1 && num2 / num1 < 1.0001;
+  return 0.999 < num2 / num1 && num2 / num1 < 1.001;
 }
 
 /**
